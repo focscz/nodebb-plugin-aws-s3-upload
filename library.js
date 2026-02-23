@@ -107,7 +107,17 @@ plugin.uploadImage = async (data) => {
       throw new Error('Invalid image path');
     }
 
-    if (!plugin.isExtensionAllowed(image.path, allowed)) {
+    // In some places from where an image is uploaded, image.path contains file name with the extension.
+    // In some place, the image.path is path to temp dir without extension, but the file name is in image.originalname.
+    // This plugin originally works only with image.path, I had to add image.originalname.
+    let nameToCheck;
+    if (image.originalname) {
+      nameToCheck = image.originalname;
+    }
+    else {
+      name = image.path;
+    }
+    if (!plugin.isExtensionAllowed(nameToCheck, allowed)) {
       throw new Error(`[[error:invalid-file-type, ${allowed.join('&#44; ')}]]`);
     }
 
